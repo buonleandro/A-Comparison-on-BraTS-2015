@@ -3,7 +3,7 @@ from keras import backend as K
 from keras.models import Model
 from keras.layers import *
 from keras.losses import binary_crossentropy
-from keras.optimizers import adadelta_v2,adam_v2,nadam_v2
+from keras.optimizers import adadelta_v2,adam_v2
 
 smooth = 1
 def DiceCoeff(y_true, y_pred):
@@ -83,7 +83,7 @@ def MNet(size_set=512):
     out10 = average([out6, out7, out8, out9])
     model = Model(inputs=img_input, outputs=out10)
 
-    model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss=[BceDiceLoss], metrics=[DiceCoeff,'accuracy',m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
+    model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4, beta_1=0.9, beta_2=0.999, epsilon=10e-08), loss=[DiceCoeffLoss], metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
 
     model.summary()
 
@@ -191,61 +191,5 @@ def ResUNet():
     model.summary()
 
     model.compile(optimizer=adadelta_v2.Adadelta(), loss=[DiceCoeffLoss], metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
-
-    return model
-
-def ResUNetPP():
-    inputs = Input((512,512, 1))
-    conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(inputs)
-    conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv1)
-    conc1 = concatenate([inputs, conv1], axis=3)
-    pool1 = MaxPooling2D(pool_size=(2, 2))(conc1)
-
-    conv2 = Conv2D(64, (3, 3), activation='relu', padding='same')(pool1)
-    conv2 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv2)
-    conc2 = concatenate([pool1, conv2], axis=3)
-    pool2 = MaxPooling2D(pool_size=(2, 2))(conc2)
-
-    conv3 = Conv2D(128, (3, 3), activation='relu', padding='same')(pool2)
-    conv3 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv3)
-    conc3 = concatenate([pool2, conv3], axis=3)
-    pool3 = MaxPooling2D(pool_size=(2, 2))(conc3)
-
-    conv4 = Conv2D(256, (3, 3), activation='relu', padding='same')(pool3)
-    conv4 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv4)
-    conc4 = concatenate([pool3, conv4], axis=3)
-    pool4 = MaxPooling2D(pool_size=(2, 2))(conc4)
-
-    conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(pool4)
-    conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(conv5)
-    conc5 = concatenate([pool4, conv5], axis=3)
-
-    up6 = concatenate([Conv2DTranspose(256, (2, 2), strides=(2, 2), padding='same')(conc5), conv4], axis=3)
-    conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(up6)
-    conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv6)
-    conc6 = concatenate([up6, conv6], axis=3)
-
-    up7 = concatenate([Conv2DTranspose(128, (2, 2), strides=(2, 2), padding='same')(conc6), conv3], axis=3)
-    conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(up7)
-    conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv7)
-    conc7 = concatenate([up7, conv7], axis=3)
-
-    up8 = concatenate([Conv2DTranspose(64, (2, 2), strides=(2, 2), padding='same')(conc7), conv2], axis=3)
-    conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(up8)
-    conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv8)
-    conc8 = concatenate([up8, conv8], axis=3)
-
-    up9 = concatenate([Conv2DTranspose(32, (2, 2), strides=(2, 2), padding='same')(conc8), conv1], axis=3)
-    conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(up9)
-    conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv9)
-    conc9 = concatenate([up9, conv9], axis=3)
-
-    conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conc9)
-
-    model = Model(inputs=[inputs], outputs=[conv10])
-
-    model.summary()
-
-    model.compile(optimizer=adadelta_v2.Adadelta(), loss=[DiceCoeffLoss()], metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
 
     return model
