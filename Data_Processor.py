@@ -2,6 +2,15 @@ import numpy as np
 from Data_Extractor import ReadMRI
 from PIL import Image
 
+def normalize_one_volume(self, volume):
+    new_volume = np.zeros(volume.shape)
+    location = np.where(volume != 0)
+    mean = np.mean(volume[location])
+    var = np.std(volume[location])
+    new_volume[location] = (volume[location] - mean) / var
+
+    return new_volume
+
 def ShiftIntensity(volume):
     location = np.where(volume != 0)
     minimum = np.min(volume[location])
@@ -42,7 +51,7 @@ def MergeMRIAndSave(flair, t2, t1c, t1, idx):
     t2 = ShiftIntensity(t2)
     t1c = ShiftIntensity(t1c)
 
-    out = np.stack([flair, t2, t1c, t1],axis=0)
+    out = np.stack([normalize_one_volume(flair), normalize_one_volume(t2), normalize_one_volume(t1c), normalize_one_volume(t1)],axis=0)
     out = np.moveaxis(out,1,-1)
 
     out = out[out.shape[0] // 2, :, :]
