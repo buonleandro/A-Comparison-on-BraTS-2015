@@ -30,7 +30,7 @@ def ScaleIntensity(volume):
     new_volume[location] = volume[location] * IntensityScale
     return new_volume
 
-def MergeMRIAndSave(flair, t2, t1c, t1, idx):
+def MergeMRIAndSave(flair, t2, t1c, t1, fld, idx):
     flair = ReadMRI(flair)
     t2 = ReadMRI(t2)
     t1c = ReadMRI(t1c)
@@ -59,7 +59,7 @@ def MergeMRIAndSave(flair, t2, t1c, t1, idx):
 
     out = Image.fromarray(out)
     out = out.resize((512,512), resample=Image.LANCZOS)
-    out.save("./testing/mri-{}.tif".format(idx))
+    out.save("./{}/mri-{}.tif".format(fld,idx))
 
 def ProcessMaskAndSave(mask, idx):
 
