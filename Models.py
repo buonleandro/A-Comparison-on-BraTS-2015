@@ -83,7 +83,7 @@ def MNet(size_set=512):
     out10 = average([out6, out7, out8, out9])
     model = Model(inputs=img_input, outputs=out10)
 
-    model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4, beta_1=0.9, beta_2=0.999, epsilon=10e-08), loss=[DiceCoeffLoss], metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
+    model.compile(optimizer=adam_v2.Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, epsilon=10e-08), loss='binary_crossentropy', metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
 
     model.summary()
 
@@ -133,7 +133,7 @@ def UNet(input_size = (512, 512, 1)):
 
     model = Model(inputs= inputs, outputs= conv10)
 
-    model.compile(optimizer = adam_v2.Adam(learning_rate = 1e-4), loss=[BceDiceLoss], metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
+    model.compile(optimizer = adam_v2.Adam(learning_rate = 1e-4, beta_1=0.9, beta_2=0.999, epsilon=0.01), loss=[BceDiceLoss], metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
 
     model.summary()
     return model
@@ -190,6 +190,6 @@ def ResUNet():
 
     model.summary()
 
-    model.compile(optimizer=adadelta_v2.Adadelta(), loss=[DiceCoeffLoss], metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
+    model.compile(optimizer=adam_v2.Adam(learning_rate = 1e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.000000199), loss=[DiceCoeffLoss], metrics=[DiceCoeff,m.Accuracy(),m.Precision(),m.Recall(),m.TruePositives(),m.TrueNegatives(),m.FalsePositives(),m.FalseNegatives()])
 
     return model
